@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 const bcrypt = require("bcryptjs");
 const { PrismaClient, StoreRole } = require("@prisma/client");
+const { PrismaPg } = require("@prisma/adapter-pg");
+const { Pool } = require("pg");
 
 function toSlug(input) {
   return String(input)
@@ -11,7 +13,8 @@ function toSlug(input) {
 }
 
 async function main() {
-  const prisma = new PrismaClient({});
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
   const demoEmail = "owner@demo.com";
   const demoPassword = "Demo12345!";
