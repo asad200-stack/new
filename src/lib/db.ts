@@ -6,7 +6,7 @@ declare global {
 
 function getClient() {
   if (!global.__prisma) {
-    global.__prisma = new PrismaClient();
+    global.__prisma = new PrismaClient({});
   }
   return global.__prisma;
 }

@@ -14,7 +14,7 @@ function run(cmd, args) {
   });
 }
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({});
 
 try {
   const userCount = await prisma.user.count();

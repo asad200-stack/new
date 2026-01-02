@@ -11,7 +11,7 @@ function toSlug(input) {
 }
 
 async function main() {
-  const prisma = new PrismaClient();
+  const prisma = new PrismaClient({});
 
   const demoEmail = "owner@demo.com";
   const demoPassword = "Demo12345!";
