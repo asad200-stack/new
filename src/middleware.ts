@@ -4,7 +4,27 @@ import { verifySessionToken } from "@/lib/auth";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (!pathname.startsWith("/dashboard")) return NextResponse.next();
+  const res = NextResponse.next();
+
+  // Ensure CSRF cookie exists for authenticated flows (double-submit token).
+  // This MUST happen in middleware/route handlers (not in Server Components).
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register")
+  ) {
+    if (!req.cookies.get("csrf_token")?.value) {
+      res.cookies.set("csrf_token", crypto.randomUUID(), {
+        httpOnly: false,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    }
+  }
+
+  if (!pathname.startsWith("/dashboard")) return res;
 
   const token = req.cookies.get("session")?.value;
   if (!token) {
@@ -24,11 +44,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  return res;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/login", "/register"],
 };
 
 
